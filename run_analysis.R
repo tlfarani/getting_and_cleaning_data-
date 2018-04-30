@@ -5,7 +5,8 @@ library(dplyr)
 library(tidyr)
 
 ######################### General info ##################################
-setwd("~/3. Getting and Cleaning Data/course_project/UCI HAR Dataset")
+setwd("~/3. Getting and Cleaning Data/Projeto Final/UCI HAR Dataset")
+
 
 activity_labels <- fread("activity_labels.txt")     #activities labels
 
@@ -13,15 +14,16 @@ features <- fread("features.txt")                   #features names
 
 
 ########################## Test data set #######################
+
 # by the Readme file, there are 9 volunteers taking 
 # 6 activities each #
 
-setwd("~/3. Getting and Cleaning Data/course_project/test")
+setwd("~/3. Getting and Cleaning Data/Projeto Final/UCI HAR Dataset/test")
 
-### Load subject_test
+### subjetc_test
 subject_test <- fread("subject_test.txt")
 
-# Find out how many unique values are there in subject_test
+# Find out how many unique values there are in subject_test
 unique(subject_test)                          # we can see that this vector represents the volunteers in the test group
                                               # this retrieves the following volunteers: 2, 4, 9, 10, 12, 13, 18, 20, 24
 
@@ -31,7 +33,7 @@ subject_test_1 <- subject_test[, .N, by=V1]   # we can see the following distrib
 # Rename values on volunteers
 subject_test$volunteer <- paste("volunteer", subject_test$V1, sep = ".")
 
-### Load y_test
+### y_test
 y_test <- fread("y_test.txt")
 
 # Find out how many unique values there are in subject_test
@@ -55,7 +57,7 @@ y_test <- mutate(y_test, activity = recode(y_test$V1,
 
 ### x_test
 
-# Load x_test represents the observations for the 561 features
+# x_test represents the observations for the 561 features
 x_test <- fread("X_test.txt")                
 
 # get readable names to x_test variables
@@ -79,7 +81,7 @@ x_test <- cbind(volunteer = subject_test$volunteer,
                 activity = y_test$activity, 
                 x_test)
 
-## Insert column "test"group"
+## Insert column test
 x_test$group <- "test"
 
 
@@ -95,12 +97,12 @@ rm(subject_test, x_test, x_test1, y_test)
 
 ############################ Training data set #########################
 # 21 volunteers
-setwd("~/3. Getting and Cleaning Data/course_project/train")
+setwd("~/3. Getting and Cleaning Data/Projeto Final/UCI HAR Dataset/train")
 
-### Load subjetc_test
+### subjetc_test
 subject_train.txt <- fread("subject_train.txt")
 
-# Find out how many unique values there are in subject_train
+# Find out how many unique values there are in subject_test
 unique(subject_train)                           # we can see that this vector represents the volunteers in the test group
                                                 # this retrieves the following volunteers: 1, 3, 5, 6, 7, 8, 11, 14, 15, 16, 17, 19, 21, 22, 23, 25, 26, 27, 28, 29, 30
 
@@ -113,7 +115,7 @@ subject_train$volunteer <- paste("volunteer", subject_train$V1, sep = ".")
 ### y_train
 y_train <- fread("y_train.txt")
 
-# Find out how many unique values are there in subject_train
+# Find out how many unique values there are in subject_test
 unique(y_train)                                # we can see that this vector represents the 6 activities
 
 # Find out how many observations per volunteer
@@ -130,7 +132,7 @@ y_train <- mutate(y_train, activity = recode(y_train$V1,
 
 ### x_train
 
-# Load x_train
+# x_test represents the observations for the 561 features
 x_train <- fread("X_train.txt")                
 
 # rename x variables according to name_x vector
@@ -147,11 +149,7 @@ x_train <- cbind(volunteer = subject_train$volunteer,
 
 
 ## Select only features mean and std
-x_train_final <- select(x_train, 
-                        group, 
-                        volunteer, 
-                        activity, 
-                        matches("mean|std"))
+x_train_final <- select(x_train, group, volunteer, activity, matches("mean|std"))
 
 
 ## Remove intermediate data
@@ -167,7 +165,8 @@ x_complete <- rbind(x_test_final, x_train_final)
 x_complete_group <- group_by(x_complete, volunteer, activity)
 
 ## Average
-
+nomes <- names(x_complete_group)
+y <- c(nomes[4:length(nomes)])
 x_complete_average <- summarise_at(x_complete_group, y, mean, na.rm = TRUE)
 
-write.table(x_complete_average, "tidy_data.txt", row.names = FALSE)
+write.csv(x_complete_average, "x_complete_average.csv")
